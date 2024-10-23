@@ -10,11 +10,17 @@ import (
 )
 
 func CreateUser(c echo.Context) error {
-    
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
 
-    if email != "" && username != "" && password != "" {
+    if email == "" && username == "" && password == "" {
         return c.String(http.StatusBadRequest, "invalid arguments")
+    }
+
+    var this_user models.User
+    db.Where("username = ? OR email = ?", username, email).Find(&this_user)
+
+    if this_user.ID > 0 {
+        return c.String(http.StatusConflict, "this user already exists")
     }
 
     user := models.User{
@@ -25,17 +31,12 @@ func CreateUser(c echo.Context) error {
         },
     }
 
-    access, err1 := service.NewAccessToken(username, email)
-    refresh, err2 := service.NewRefreshToken()
-
-    if err1 != nil || err2 != nil {
-        return c.String(http.StatusInternalServerError, "failed to generate tokens")
-    }
-
     db.Create(&user)
 
+    access := service.NewAccessToken(username)
+    refresh := service.NewRefreshToken()
+
     return c.JSON(http.StatusCreated, map[string]string{
-        "username": user.Username,
         "access_token": access,
         "refresh_token": refresh,
     })
