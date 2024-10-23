@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"online_chat/models"
 	"online_chat/password_hashing"
+	"online_chat/service"
 
 	"github.com/labstack/echo/v4"
 )
@@ -24,9 +25,27 @@ func CreateUser(c echo.Context) error {
         },
     }
 
+    access, err1 := service.NewAccessToken(username, email)
+    refresh, err2 := service.NewRefreshToken()
+
+    if err1 != nil || err2 != nil {
+        return c.String(http.StatusInternalServerError, "failed to generate tokens")
+    }
+
     db.Create(&user)
 
-    return c.JSON(http.StatusCreated, user)
+    return c.JSON(http.StatusCreated, map[string]string{
+        "username": user.Username,
+        "access_token": access,
+        "refresh_token": refresh,
+    })
+}
+
+func GetAllUsers(c echo.Context) error {
+    var users []models.User
+    db.Preload("Password").Find(&users)
+    
+    return c.JSON(http.StatusOK, users)
 }
 
 func GetUserByID(c echo.Context) error {
