@@ -7,34 +7,25 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func NewAccessToken(username string, email string) (string, error) {
+func NewAccessToken(username string) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, 
 	jwt.MapClaims{
 		"username": username,
-		"email": email,
 		"exp": time.Now().Add(time.Minute * 15).Unix(),
 	})
 
-	access_token, err := token.SignedString([]byte(enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")))
+	access_token, _ := token.SignedString([]byte(enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")))
 
-	if err != nil {
-		return "", err
-	}
-
-	return access_token, nil
+	return access_token
 }
 
-func NewRefreshToken() (string, error) {
+func NewRefreshToken() string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, 
 		jwt.MapClaims{
 			"exp": time.Now().Add(time.Hour * 168).Unix(),
 		})
 
-	refresh_token, err := token.SignedString([]byte(enviroment.GoDotEnvVariable("REFRESH_TOKEN_SECRET")))
+	refresh_token, _ := token.SignedString([]byte(enviroment.GoDotEnvVariable("REFRESH_TOKEN_SECRET")))
 
-	if err != nil {
-		return "", err
-	}
-
-	return refresh_token, nil
+	return refresh_token
 }

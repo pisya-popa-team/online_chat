@@ -11,18 +11,19 @@ import (
 func main() {
 	e := echo.New()
 
-	auth := e.Group("/auth")
+	access := e.Group("/access")
 
-	auth.Use(echojwt.WithConfig(echojwt.Config{
+	access.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")),
 	}))
 
-	e.POST("/user", handlers.CreateUser)
+	e.POST("/reg", handlers.CreateUser)
+	e.POST("/auth", handlers.Authorisation)
 
-	auth.GET("/user/:id", handlers.GetUserByID)
-	auth.GET("/users", handlers.GetAllUsers)
-	auth.PUT("/user/:id", handlers.UpdateUser)
-	auth.DELETE("/user/:id", handlers.DeleteUser)
+	access.GET("/user/:id", handlers.GetUserByID)
+	access.GET("/users", handlers.GetAllUsers)
+	access.PUT("/user/:id", handlers.UpdateUser)
+	access.DELETE("/user/:id", handlers.DeleteUser)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
