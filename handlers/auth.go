@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"online_chat/models"
 	"online_chat/password_hashing"
@@ -21,7 +20,6 @@ func Authorisation(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "invalid username")
 	}
 
-	fmt.Println(password_hashing.DoPasswordsMatch(user.Password.Hash, password))
 
 	if !password_hashing.DoPasswordsMatch(user.Password.Hash, password){
 		return c.String(http.StatusUnauthorized, "invalid password")
