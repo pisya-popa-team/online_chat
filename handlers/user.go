@@ -5,6 +5,7 @@ import (
 	"online_chat/models"
 	"online_chat/password_hashing"
 	"online_chat/service"
+	"online_chat/validation"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,7 +13,7 @@ import (
 func CreateUser(c echo.Context) error {
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
 
-    if email == "" && username == "" && password == "" {
+    if (!validation.Validate(username, email, password)) {
         return c.String(http.StatusBadRequest, "invalid arguments")
     }
 
