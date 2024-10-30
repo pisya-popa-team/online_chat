@@ -50,6 +50,16 @@ func GetAllUsers(c echo.Context) error {
     return c.JSON(http.StatusOK, users)
 }
 
+func GetInfoAboutMe(c echo.Context) error {
+    auth_header := c.Request().Header.Get("Authorization")
+    username := service.ExtractUsernameFromToken(auth_header)
+
+    var user models.User
+    db.Preload("Password").Where("username = ?", username).Find(&user)
+
+    return c.JSON(http.StatusOK, user)
+}
+
 func GetUserByID(c echo.Context) error {
     var user models.User
     db.Preload("Password").Take(&user, c.Param("id"))

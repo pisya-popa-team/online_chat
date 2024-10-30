@@ -12,8 +12,6 @@ type User struct {
  	Password string `validate:"password"`
 }
 
-
-
 func Validate(username string, email string, password string) bool {
 	validate := validator.New()
 	validate.RegisterValidation("password", func(fl validator.FieldLevel) bool {

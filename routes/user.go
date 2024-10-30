@@ -15,6 +15,7 @@ func InitUserRoutes(e *echo.Echo) {
 		SigningKey: []byte(enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")),
 	}))
 
+	access.GET("/users/me", handlers.GetInfoAboutMe)
 	access.GET("/user/:id", handlers.GetUserByID)
 	access.GET("/users", handlers.GetAllUsers)
 	access.PUT("/user/:id", handlers.UpdateUser)
