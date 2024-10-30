@@ -9,7 +9,7 @@ import (
 type User struct {
 	Username string `validate:"required"`
 	Email    string `validate:"email"`
- 	Password string `validate:"password, "`
+ 	Password string `validate:"password"`
 }
 
 
