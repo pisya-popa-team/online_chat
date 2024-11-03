@@ -47,7 +47,7 @@ func CreateUser(c echo.Context) error {
 
 func GetAllUsers(c echo.Context) error {
     var users []models.User
-    db.Preload("Password").Find(&users)
+    db.Preload("Password").Preload("Room").Find(&users)
     
     return c.JSON(http.StatusOK, users)
 }
@@ -57,14 +57,14 @@ func GetInfoAboutMe(c echo.Context) error {
     username := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
     var user models.User
-    db.Preload("Password").Where("username = ?", username).Find(&user)
+    db.Preload("Password").Preload("Room").Where("username = ?", username).Find(&user)
 
     return c.JSON(http.StatusOK, user)
 }
 
 func GetUserByID(c echo.Context) error {
     var user models.User
-    db.Preload("Password").Take(&user, c.Param("id"))
+    db.Preload("Password").Preload("Room").Take(&user, c.Param("id"))
 
     if user.ID == 0 {
         return c.String(http.StatusNotFound, "no user found")
@@ -75,7 +75,7 @@ func GetUserByID(c echo.Context) error {
 
 func UpdateUser(c echo.Context) error {
     var user models.User
-    db.Preload("Password").Take(&user, c.Param("id"))
+    db.Preload("Password").Preload("Room").Take(&user, c.Param("id"))
 
     if user.ID == 0 {
         return c.String(http.StatusNotFound, "no user found")
@@ -90,7 +90,7 @@ func UpdateUser(c echo.Context) error {
 
 func DeleteUser(c echo.Context) error {
     var user models.User
-    db.Preload("Password").Take(&user, c.Param("id"))
+    db.Preload("Password").Preload("Room").Take(&user, c.Param("id"))
 
     if user.ID == 0 {
         return c.String(http.StatusNotFound, "no user found")
