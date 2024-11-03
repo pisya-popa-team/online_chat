@@ -6,6 +6,7 @@ import (
 	"online_chat/password_hashing"
 	"online_chat/service"
 	"online_chat/validation"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -35,7 +36,7 @@ func CreateUser(c echo.Context) error {
     db.Create(&user)
 
     access := service.NewAccessToken(username)
-    refresh := service.NewRefreshToken()
+    refresh := service.NewRefreshToken(username)
 
     return c.JSON(http.StatusCreated, map[string]string{
         "access_token": access,
@@ -52,7 +53,9 @@ func GetAllUsers(c echo.Context) error {
 
 func GetInfoAboutMe(c echo.Context) error {
     auth_header := c.Request().Header.Get("Authorization")
-    username := service.ExtractUsernameFromToken(auth_header)
+    header_parts := strings.Split(auth_header, " ")
+    
+    username := service.ExtractUsernameFromToken(header_parts[1], access_secret)
 
     var user models.User
     db.Preload("Password").Where("username = ?", username).Find(&user)

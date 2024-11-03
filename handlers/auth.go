@@ -26,10 +26,9 @@ func Authorisation(c echo.Context) error {
 	}
 
 	access := service.NewAccessToken(username)
-    refresh := service.NewRefreshToken()
+    refresh := service.NewRefreshToken(username)
 
 	return c.JSON(http.StatusOK, map[string]string{
-  		"message": "welcome " + user.Username + "!",
         "access_token": access,
         "refresh_token": refresh,
     })

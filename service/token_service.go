@@ -2,7 +2,6 @@ package service
 
 import (
 	"online_chat/enviroment"
-	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -21,9 +20,10 @@ func NewAccessToken(username string) string {
 }
 
 
-func NewRefreshToken() string {
+func NewRefreshToken(username string) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, 
 		jwt.MapClaims{
+			"username": username,
 			"exp": time.Now().Add(time.Hour * 168).Unix(),
 		})
 
@@ -32,16 +32,19 @@ func NewRefreshToken() string {
 	return refresh_token
 }
 
-func ExtractUsernameFromToken(header string) string {
-	header_parts := strings.Split(header, " ")
-	token, _ := jwt.Parse(header_parts[1], func(token *jwt.Token) (interface{}, error) {
-		return []byte(enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")), nil
+func ParseToken(token string, secret string) (*jwt.Token, error) {
+	parsed_token, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
 	})
+	return parsed_token, err
+}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	var username string
-	if ok && token.Valid {
-        username = claims["username"].(string)	
-    }
+func ExtractUsernameFromToken(token_string string, secret string) string {
+	token, _ := ParseToken(token_string, secret)
+
+	claims, _ := token.Claims.(jwt.MapClaims)
+
+    username := claims["username"].(string)
+		
 	return username
 }
