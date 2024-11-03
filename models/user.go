@@ -7,4 +7,5 @@ type User struct {
 	Username string
 	Email    string
 	Password Password `gorm:"foreignKey:UserID"`
+	Room     []Room   `gorm:"foreignKey:UserID"`
 }
