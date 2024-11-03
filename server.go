@@ -11,6 +11,7 @@ func main() {
 	routes.InitRegRoute(e)
 	routes.InitAuthRoute(e)
 	routes.InitUserRoutes(e)
+	routes.InitRefreshRoute(e)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

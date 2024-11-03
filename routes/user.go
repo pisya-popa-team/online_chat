@@ -14,7 +14,7 @@ func InitUserRoutes(e *echo.Echo) {
 	access.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")),
 	}))
-
+	
 	access.GET("/users/me", handlers.GetInfoAboutMe)
 	access.GET("/user/:id", handlers.GetUserByID)
 	access.GET("/users", handlers.GetAllUsers)

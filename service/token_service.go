@@ -14,7 +14,11 @@ func NewAccessToken(username string) string {
         "exp": time.Now().Add(time.Minute * 15).Unix(),
 	})
 
-	access_token, _ := token.SignedString([]byte(enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")))
+	access_token, err := token.SignedString([]byte(enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")))
+
+	if err != nil {
+        return ""
+    }
 
 	return access_token
 }
@@ -27,7 +31,11 @@ func NewRefreshToken(username string) string {
 			"exp": time.Now().Add(time.Hour * 168).Unix(),
 		})
 
-	refresh_token, _ := token.SignedString([]byte(enviroment.GoDotEnvVariable("REFRESH_TOKEN_SECRET")))
+	refresh_token, err := token.SignedString([]byte(enviroment.GoDotEnvVariable("REFRESH_TOKEN_SECRET")))
+
+	if err != nil {
+        return ""
+    }
 
 	return refresh_token
 }

@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"net/http"
+	"online_chat/enviroment"
 	"online_chat/models"
 	"online_chat/password_hashing"
 	"online_chat/service"
+	"online_chat/utils"
 	"online_chat/validation"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -52,10 +53,8 @@ func GetAllUsers(c echo.Context) error {
 }
 
 func GetInfoAboutMe(c echo.Context) error {
-    auth_header := c.Request().Header.Get("Authorization")
-    header_parts := strings.Split(auth_header, " ")
-    
-    username := service.ExtractUsernameFromToken(header_parts[1], access_secret)
+    token := utils.ExtractTokenFromHeaderString(c.Request().Header.Get("Authorization"))
+    username := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
     var user models.User
     db.Preload("Password").Where("username = ?", username).Find(&user)
