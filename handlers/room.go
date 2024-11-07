@@ -6,14 +6,12 @@ import (
 	"online_chat/models"
 	"online_chat/service"
 	"online_chat/utils"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
 
-// переделать в запись в таблице
-// var (
-// 	num = 0
-// )
+
 
 func CreateRoom(c echo.Context) error {
 	token := utils.ExtractTokenFromHeaderString(c.Request().Header.Get("Authorization"))
@@ -22,27 +20,25 @@ func CreateRoom(c echo.Context) error {
 	var (
 		user models.User
 		room models.Room
-		room_type models.RoomType
 	)
 
 	db.Where("username = ?", username).Find(&user)
 
 	password := c.FormValue("password")
 	if password == "" {
-		db.Where("type = ?", "public").Find(&room_type)
 		room = models.Room{
-			Name: "Рум #000",
 			UserID: user.ID,
-			RoomTypeID: room_type.ID,
-			RoomType: room_type,
+			RoomType: models.RoomType{
+				Type: models.Public,
+			},
 		}
+
 	} else {
-		db.Where("type = ?", "private").Find(&room_type)
 		room = models.Room{
-			Name: "Рум #111",
 			UserID: user.ID,
-			RoomTypeID: room_type.ID,
-			RoomType: room_type,
+			RoomType: models.RoomType{
+				Type: models.Private,
+			},
 			RoomPassword: models.RoomPassword{
 				Password: password,
 			},
@@ -50,7 +46,9 @@ func CreateRoom(c echo.Context) error {
 	}
 
 	db.Create(&room)
-
+	
+	db.Model(&room).Update("name", "Рум #" + strconv.Itoa(int(room.ID)))
+	
 	return c.JSON(http.StatusCreated, room)
 }
 
@@ -62,17 +60,11 @@ func GetRooms(c echo.Context) error {
     return c.JSON(http.StatusOK, rooms)
 }
 
-// func FindRoomByName(c echo.Context) error {
-// 	room_name := c.Q
-// 	var room models.Room
-// 	db.Preload("RoomPassword").Preload("RoomType").Take(&room, room_name)
-
-// 	return c.JSON(http.StatusOK, room_name)
-// }
 
 func EnterRoom(c echo.Context) error {
 	var room models.Room
-	db.Preload("RoomPassword").Preload("RoomType").Take(&room, c.Param("id"))
+	db.Preload("RoomType").Preload("RoomPassword").Where("name = ?", c.FormValue("name")).First(&room)
+
 	if room.RoomType.Type == "private" {
 		password := c.FormValue("password")
 		if password != room.RoomPassword.Password {
@@ -84,9 +76,21 @@ func EnterRoom(c echo.Context) error {
 	return c.JSON(http.StatusOK, room)
 }
 
+func FindRoomByName(c echo.Context) error {
+	var rooms []models.Room
+	db.Preload("RoomPassword").Preload("RoomType").Where("name LIKE ?", "%" + c.Param("name") + "%").Find(&rooms)
+
+	return c.JSON(http.StatusOK, rooms)
+}
+
 func DeleteRoom(c echo.Context) error {
 	var room models.Room
     db.Preload("RoomPassword").Preload("RoomType").Take(&room, c.Param("id"))
+
+	if room.ID == 0 {
+		return c.String(http.StatusNotFound, "no room found")
+	}
+
     db.Delete(&room)
 
     return c.String(http.StatusOK, "room deleted")
