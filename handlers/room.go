@@ -6,15 +6,14 @@ import (
 	"online_chat/models"
 	"online_chat/service"
 	"online_chat/utils"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
 
-//переделать в запись в таблице
-var (
-	num = 0
-)
+// переделать в запись в таблице
+// var (
+// 	num = 0
+// )
 
 func CreateRoom(c echo.Context) error {
 	token := utils.ExtractTokenFromHeaderString(c.Request().Header.Get("Authorization"))
@@ -32,7 +31,7 @@ func CreateRoom(c echo.Context) error {
 	if password == "" {
 		db.Where("type = ?", "public").Find(&room_type)
 		room = models.Room{
-			Name: "Рум #" + strconv.Itoa(num),
+			Name: "Рум #000",
 			UserID: user.ID,
 			RoomTypeID: room_type.ID,
 			RoomType: room_type,
@@ -40,7 +39,7 @@ func CreateRoom(c echo.Context) error {
 	} else {
 		db.Where("type = ?", "private").Find(&room_type)
 		room = models.Room{
-			Name: "Рум #" + strconv.Itoa(num),
+			Name: "Рум #111",
 			UserID: user.ID,
 			RoomTypeID: room_type.ID,
 			RoomType: room_type,
@@ -64,15 +63,26 @@ func GetRooms(c echo.Context) error {
 }
 
 // func FindRoomByName(c echo.Context) error {
+// 	room_name := c.Q
 // 	var room models.Room
-// 	db.Preload("RoomPassword").Preload("RoomType").Take(&room, c.Param("name"))
+// 	db.Preload("RoomPassword").Preload("RoomType").Take(&room, room_name)
 
-// 	if room.Name == "" {
-// 		return c.String(http.StatusNotFound, "there's no such room under that name")
-// 	}
-
-// 	return c.JSON(http.StatusOK, room)
+// 	return c.JSON(http.StatusOK, room_name)
 // }
+
+func EnterRoom(c echo.Context) error {
+	var room models.Room
+	db.Preload("RoomPassword").Preload("RoomType").Take(&room, c.Param("id"))
+	if room.RoomType.Type == "private" {
+		password := c.FormValue("password")
+		if password != room.RoomPassword.Password {
+			return c.String(http.StatusBadRequest, "Invalid room password")
+		}
+		return c.JSON(http.StatusOK, room)
+	}
+
+	return c.JSON(http.StatusOK, room)
+}
 
 func DeleteRoom(c echo.Context) error {
 	var room models.Room
