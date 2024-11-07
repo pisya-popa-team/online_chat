@@ -9,6 +9,10 @@ import (
 
 var dbConnection *gorm.DB
 
+var(
+	this_room_type models.RoomType
+)
+
 func GetDBConnection() *gorm.DB {
 	if dbConnection == nil {
 		connectDB()
@@ -18,11 +22,15 @@ func GetDBConnection() *gorm.DB {
 }
 
 func initRecords(db *gorm.DB) {
-	room_type := []*models.RoomType{
-		{Type: "public"},
-        {Type: "private"},
+	db.Where("type = ?", "public").Or("type = ?", "private").Find(&this_room_type)
+	if this_room_type.ID == 0 {
+		room_type := []*models.RoomType{
+			{Type: "public"},
+			{Type: "private"},
+		}
+
+		_ = db.Create(room_type)
 	}
-	_ = db.Create(room_type)
 }
 
 func connectDB() *gorm.DB {
