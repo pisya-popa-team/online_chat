@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 type RoomPassword struct {
-	gorm.Model
+	ID       uint   `gorm:"primary_key"`
 	Password string `default:""`
 	RoomID   uint
 }

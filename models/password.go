@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 type Password struct {
-	gorm.Model
+	ID     uint     `gorm:"primary_key"`
 	Hash   string
 	UserID uint
 }

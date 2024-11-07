@@ -1,8 +1,12 @@
 package models
 
-import "gorm.io/gorm"
+type Type string
 
+const (
+	Private Type = "private"
+	Public  Type = "public"
+)
 type RoomType struct {
-	gorm.Model
-	Type string
+	ID   uint     `gorm:"primary_key"`
+	Type Type
 }

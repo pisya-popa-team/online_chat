@@ -1,10 +1,8 @@
 package models
 
-import "gorm.io/gorm"
-
 type Room struct {
-	gorm.Model
-	Name         string
+	ID           uint         `gorm:"primary_key"`
+	Name         string       `default:""`
 	UserID       uint
 	RoomTypeID   uint
 	RoomType     RoomType
