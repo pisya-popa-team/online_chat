@@ -28,7 +28,6 @@ func connectDB() *gorm.DB {
 		&models.User{},
 		&models.Password{},
 		&models.Room{},
-		&models.RoomType{},
 		&models.RoomPassword{},
 	)
 

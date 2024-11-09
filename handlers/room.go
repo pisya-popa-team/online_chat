@@ -28,17 +28,12 @@ func CreateRoom(c echo.Context) error {
 	if password == "" {
 		room = models.Room{
 			UserID: user.ID,
-			RoomType: models.RoomType{
-				Type: models.Public,
-			},
+			RoomType: models.Public,
 		}
-
 	} else {
 		room = models.Room{
 			UserID: user.ID,
-			RoomType: models.RoomType{
-				Type: models.Private,
-			},
+			RoomType: models.Private,
 			RoomPassword: models.RoomPassword{
 				Password: password,
 			},
@@ -65,7 +60,7 @@ func EnterRoom(c echo.Context) error {
 	var room models.Room
 	db.Preload("RoomType").Preload("RoomPassword").Where("name = ?", c.FormValue("name")).First(&room)
 
-	if room.RoomType.Type == "private" {
+	if room.RoomType == "private" {
 		password := c.FormValue("password")
 		if password != room.RoomPassword.Password {
 			return c.String(http.StatusBadRequest, "Invalid room password")

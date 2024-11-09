@@ -1,12 +1,8 @@
 package models
 
-type Type string
+type RoomType string
 
 const (
-	Private Type = "private"
-	Public  Type = "public"
+	Private RoomType = "private"
+	Public  RoomType = "public"
 )
-type RoomType struct {
-	ID   uint     `gorm:"primary_key"`
-	Type Type
-}
