@@ -14,9 +14,10 @@ import (
 
 func CreateUser(c echo.Context) error {
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
-
-    if (!validation.Validate(username, email, password)) {
-        return c.String(http.StatusBadRequest, "invalid arguments")
+    
+    correct, err_message := validation.Validate(username, email, password)
+    if (!correct) {
+        return c.String(http.StatusBadRequest, err_message)
     }
 
     var this_user models.User
