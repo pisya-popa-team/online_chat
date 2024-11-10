@@ -4,5 +4,5 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY ./ ./
 RUN CGO_ENABLED=1 GOOS=linux go build -o /online-chat
-EXPOSE 8080
+EXPOSE 1323
 CMD ["/online-chat"]
