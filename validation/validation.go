@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	Username string `validate:"required"`
+	Username string `validate:"min=3"`
 	Email    string `validate:"email"`
  	Password string `validate:"password"`
 }
@@ -15,7 +15,7 @@ type User struct {
 func Validate(username string, email string, password string) bool {
 	validate := validator.New()
 	validate.RegisterValidation("password", func(fl validator.FieldLevel) bool {
-        re := regexp.MustCompile(`^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)$`)
+        re := regexp.MustCompile(`^(.{0,6}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)$`)
         return !re.MatchString(fl.Field().String())
     })
 
