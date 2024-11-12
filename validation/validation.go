@@ -27,5 +27,11 @@ func Validate(username string, email string, password string) (bool, string) {
 
 	err := validate.Struct(user)
 
-	return err == nil, err.Error()
+	error_message := ""
+
+	if err != nil {
+		error_message = err.Error()
+    }
+
+	return err == nil, error_message
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"net/http"
+	// "net/http"
 	"online_chat/enviroment"
 	"online_chat/routes"
 
@@ -14,11 +14,13 @@ import (
 func main() {
 	e := echo.New()
 
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"https://api-tt-chat.danyatochka.ru", "http://localhost:4200"},
-		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
-		AllowCredentials: true,
-	}))
+	// e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	// 	AllowOrigins: []string{"https://api-tt-chat.danyatochka.ru", "http://localhost:4200"},
+	// 	AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+	// 	AllowCredentials: true,
+	// }))
+
+	e.Use(middleware.CORS())
 
 	access := e.Group("/access")
 	access.Use(echojwt.WithConfig(echojwt.Config{
