@@ -50,7 +50,7 @@ func CreateRoom(c echo.Context) error {
 func GetRooms(c echo.Context) error {
 	var rooms []models.Room
 
-    db.Preload("RoomPassword").Preload("RoomType").Find(&rooms)
+    db.Preload("RoomPassword").Find(&rooms)
 
     return c.JSON(http.StatusOK, rooms)
 }
@@ -58,7 +58,7 @@ func GetRooms(c echo.Context) error {
 
 func EnterRoom(c echo.Context) error {
 	var room models.Room
-	db.Preload("RoomType").Preload("RoomPassword").Where("name = ?", c.FormValue("name")).First(&room)
+	db.Preload("RoomPassword").Where("name = ?", c.FormValue("name")).First(&room)
 
 	if room.RoomType == "private" {
 		password := c.FormValue("password")
@@ -73,14 +73,14 @@ func EnterRoom(c echo.Context) error {
 
 func FindRoomByName(c echo.Context) error {
 	var rooms []models.Room
-	db.Preload("RoomPassword").Preload("RoomType").Where("name LIKE ?", "%" + c.Param("name") + "%").Find(&rooms)
+	db.Preload("RoomPassword").Where("name LIKE ?", "%" + c.Param("name") + "%").Find(&rooms)
 
 	return c.JSON(http.StatusOK, rooms)
 }
 
 func DeleteRoom(c echo.Context) error {
 	var room models.Room
-    db.Preload("RoomPassword").Preload("RoomType").Take(&room, c.Param("id"))
+    db.Preload("RoomPassword").Take(&room, c.Param("id"))
 
 	if room.ID == 0 {
 		return c.String(http.StatusNotFound, "no room found")
