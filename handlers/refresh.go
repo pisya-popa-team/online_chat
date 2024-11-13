@@ -17,14 +17,20 @@ func RefreshTokens(c echo.Context) error {
 	parsed_token, _ := service.ParseToken(refresh_token, refresh_secret)
 
 	if !parsed_token.Valid {
-		return c.String(http.StatusUnauthorized, "token is invalid")
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			"status": "1",
+			"error": "token is invalid",
+		})
 	}
 	
 	username := service.ExtractUsernameFromToken(refresh_token, refresh_secret)
 
-	return c.JSON(http.StatusCreated, map[string]string {
-		"access_token": service.NewAccessToken(username),
-		"refresh_token": service.NewRefreshToken(username),
+	return c.JSON(http.StatusCreated, map[string]interface{}{
+		"status": 0,
+		"tokens": map[string]string{
+			"access_token": service.NewAccessToken(username),
+            "refresh_token": service.NewRefreshToken(username),
+		},
 	})
 
 }

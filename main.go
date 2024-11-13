@@ -1,7 +1,6 @@
 package main
 
 import (
-	// "net/http"
 	"online_chat/enviroment"
 	"online_chat/routes"
 
@@ -13,12 +12,6 @@ import (
 
 func main() {
 	e := echo.New()
-
-	// e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-	// 	AllowOrigins: []string{"https://api-tt-chat.danyatochka.ru", "http://localhost:4200"},
-	// 	AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
-	// 	AllowCredentials: true,
-	// }))
 
 	e.Use(middleware.CORS())
 
@@ -32,8 +25,6 @@ func main() {
 	routes.InitRefreshRoute(e)
 	routes.InitUserRoutes(access)
 	routes.InitRoomRoutes(access)
-
-	
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

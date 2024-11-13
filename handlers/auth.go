@@ -16,20 +16,18 @@ func Authorisation(c echo.Context) error {
 
 	db.Preload("Password").Where("username = ?", username).Find(&user)
 
-	if user.ID == 0 {
-		return c.String(http.StatusUnauthorized, "invalid username")
+	if user.ID == 0 || !password_hashing.DoPasswordsMatch(user.Password.Hash, password){
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			"status": "1",
+			"error": "invalid user info",
+		})
 	}
 
-
-	if !password_hashing.DoPasswordsMatch(user.Password.Hash, password){
-		return c.String(http.StatusUnauthorized, "invalid password")
-	}
-
-	access := service.NewAccessToken(username)
-    refresh := service.NewRefreshToken(username)
-
-	return c.JSON(http.StatusOK, map[string]string{
-        "access_token": access,
-        "refresh_token": refresh,
-    })
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"status": 0,
+		"tokens": map[string]string{
+			"access_token": service.NewAccessToken(username),
+            "refresh_token": service.NewRefreshToken(username),
+		},
+	})
 }

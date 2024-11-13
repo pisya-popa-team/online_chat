@@ -12,7 +12,7 @@ type User struct {
  	Password string `validate:"password"`
 }
 
-func Validate(username string, email string, password string) (bool, string) {
+func Validate(username string, email string, password string) string {
 	validate := validator.New()
 	validate.RegisterValidation("password", func(fl validator.FieldLevel) bool {
         re := regexp.MustCompile(`^(.{0,6}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)$`)
@@ -33,5 +33,5 @@ func Validate(username string, email string, password string) (bool, string) {
 		error_message = err.Error()
     }
 
-	return err == nil, error_message
+	return error_message
 }
