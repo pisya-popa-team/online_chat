@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"online_chat/enviroment"
 	"online_chat/service"
+	"online_chat/utils"
 
 	"github.com/labstack/echo/v4"
 )
@@ -23,13 +24,13 @@ func RefreshTokens(c echo.Context) error {
 		})
 	}
 	
-	username := service.ExtractUsernameFromToken(refresh_token, refresh_secret)
+	id := service.ExtractUsernameFromToken(refresh_token, refresh_secret)
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"status": 0,
 		"tokens": map[string]string{
-			"access_token": service.NewAccessToken(username),
-            "refresh_token": service.NewRefreshToken(username),
+			"access_token": service.NewAccessToken(utils.StringToUint(id)),
+            "refresh_token": service.NewRefreshToken(utils.StringToUint(id)),
 		},
 	})
 

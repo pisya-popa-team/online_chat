@@ -47,8 +47,8 @@ func CreateUser(c echo.Context) error {
     return c.JSON(http.StatusCreated, map[string]interface{}{
 		"status": 0,
 		"tokens": map[string]string{
-			"access_token": service.NewAccessToken(username),
-            "refresh_token": service.NewRefreshToken(username),
+			"access_token": service.NewAccessToken(user.ID),
+            "refresh_token": service.NewRefreshToken(user.ID),
 		},
 	})
 }
@@ -65,10 +65,10 @@ func GetAllUsers(c echo.Context) error {
 
 func GetInfoAboutMe(c echo.Context) error {
     token := utils.ExtractTokenFromHeaderString(c.Request().Header.Get("Authorization"))
-    username := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
+    id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
     var user models.User
-    db.Preload(clause.Associations).Where("username = ?", username).Find(&user)
+    db.Preload(clause.Associations).Where("id = ?", id).Find(&user)
 
     return c.JSON(http.StatusOK, map[string]interface{}{
         "status": 0,
