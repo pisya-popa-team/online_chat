@@ -20,9 +20,14 @@ func main() {
 		SigningKey: []byte(enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")),
 	}))
 
+	refresh := e.Group("/refresh")
+	refresh.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte(enviroment.GoDotEnvVariable("REFRESH_TOKEN_SECRET")),
+	}))
+
 	routes.InitRegRoute(e)
 	routes.InitAuthRoute(e)
-	routes.InitRefreshRoute(e)
+	routes.InitRefreshRoute(refresh)
 	routes.InitUserRoutes(access)
 	routes.InitRoomRoutes(access)
 

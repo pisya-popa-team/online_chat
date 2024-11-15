@@ -6,6 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func InitRefreshRoute(e *echo.Echo) {
-    e.POST("/refresh", handlers.RefreshTokens)
+func InitRefreshRoute(e *echo.Group) {
+    e.POST("/tokens", handlers.RefreshTokens)
 }
