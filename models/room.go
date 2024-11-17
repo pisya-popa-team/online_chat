@@ -5,5 +5,5 @@ type Room struct {
 	Name         string       `default:""`
 	UserID       uint
 	RoomType     RoomType
-	RoomPassword RoomPassword `gorm:"foreignKey:RoomID"`
+	RoomPassword RoomPassword `json:"-" gorm:"foreignKey:RoomID"`
 }

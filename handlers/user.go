@@ -10,13 +10,12 @@ import (
 	"online_chat/validation"
 
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm/clause"
 )
 
 func CreateUser(c echo.Context) error {
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
     
-    err_message := validation.Validate(username, email, password)
+    err_message := validation.ValidateReg(username, email, password)
     if (err_message != "") {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
             "status": "1",
@@ -45,7 +44,7 @@ func CreateUser(c echo.Context) error {
     db.Create(&user)
 
     return c.JSON(http.StatusCreated, map[string]interface{}{
-		"status": 0,
+		"status": "0",
 		"tokens": map[string]string{
 			"access_token": service.NewAccessToken(user.ID),
             "refresh_token": service.NewRefreshToken(user.ID),
@@ -68,68 +67,54 @@ func GetInfoAboutMe(c echo.Context) error {
     id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
     var user models.User
-    db.Preload(clause.Associations).Where("id = ?", id).Find(&user)
+    db.Preload("Password").Preload("Room").Where("id = ?", id).Find(&user)
 
     return c.JSON(http.StatusOK, map[string]interface{}{
-        "status": 0,
-        "user": user,
-    })
-}
-
-func GetUserByID(c echo.Context) error {
-    var user models.User
-    db.Preload(clause.Associations).Take(&user, c.Param("id"))
-
-    if user.ID == 0 {
-        return c.JSON(http.StatusNotFound, map[string]string{
-            "status": "1",
-            "error": "no user found",
-        })
-    }
-
-    return c.JSON(http.StatusOK, map[string]interface{}{
-        "status": 0,
+        "status": "0",
         "user": user,
     })
 }
 
 func UpdateUser(c echo.Context) error {
-    var user models.User
-    db.Preload(clause.Associations).Take(&user, c.Param("id"))
+    token := utils.ExtractTokenFromHeaderString(c.Request().Header.Get("Authorization"))
+    id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
-    if user.ID == 0 {
-        return c.JSON(http.StatusNotFound, map[string]string{
+    var user models.User
+    db.Preload("Password").Preload("Room").Where("id = ?", id).Find(&user)
+
+    username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
+    
+    err_message := validation.ValidateUpdate(username, email, password)
+    if (err_message != "") {
+        return c.JSON(http.StatusUnprocessableEntity, map[string]string{
             "status": "1",
-            "error": "no user found",
+            "error": err_message,
         })
     }
 
-    user.Username, user.Email, user.Password.Hash = c.FormValue("username"), c.FormValue("email"), password_hashing.HashPassword(c.FormValue("password"))
+    var other_user models.User
+    db.Where("username = ? OR email = ?", username, email).Find(&other_user)
 
-    db.Save(&user)
+    if other_user.ID != 0 {
+        return c.JSON(http.StatusConflict, map[string]string{
+            "status": "1",
+            "error": "this user already exists",
+        })
+    }
+
+    db.Model(&user).Updates(
+        models.User{
+            Username:username,
+            Email:    email,
+            Password: models.Password{
+                Hash: password_hashing.HashPassword(password),
+            },
+        },
+    )
 
     return c.JSON(http.StatusOK, map[string]interface{}{
-        "status": 0,
-        "user": user,
-    })
-}
-
-func DeleteUser(c echo.Context) error {
-    var user models.User
-    db.Preload("Password").Preload("Room").Take(&user, c.Param("id"))
-
-    if user.ID == 0 {
-        return c.JSON(http.StatusNotFound, map[string]string{
-            "status": "1",
-            "error": "no user found",
-        })
-    }
-
-    db.Delete(&user)
-
-    return c.JSON(http.StatusOK, map[string]string{
         "status": "0",
-        "message": "user deleted",
+        "user": user,
     })
 }
 

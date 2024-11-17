@@ -7,8 +7,6 @@ import (
 
 func InitUserRoutes(access *echo.Group) {
 	access.GET("/users/me", handlers.GetInfoAboutMe)
-	access.GET("/user/:id", handlers.GetUserByID)
 	access.GET("/users", handlers.GetAllUsers)
-	access.PUT("/user/:id", handlers.UpdateUser)
-	access.DELETE("/user/:id", handlers.DeleteUser)
+	access.PUT("/user/update", handlers.UpdateUser)
 }

@@ -7,5 +7,5 @@ import (
 )
 
 func InitRefreshRoute(e *echo.Group) {
-    e.POST("/tokens", handlers.RefreshTokens)
+    e.GET("/tokens", handlers.RefreshTokens)
 }

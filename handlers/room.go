@@ -15,14 +15,14 @@ import (
 
 func CreateRoom(c echo.Context) error {
 	token := utils.ExtractTokenFromHeaderString(c.Request().Header.Get("Authorization"))
-	username := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
+	id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 	
 	var (
 		user models.User
 		room models.Room
 	)
 
-	db.Where("username = ?", username).Find(&user)
+	db.Where("id = ?", id).Find(&user)
 
 	password := c.FormValue("password")
 	if password == "" {
