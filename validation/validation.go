@@ -7,9 +7,9 @@ import (
 )
 
 type User struct {
-	Username string `validate:"min=3" update:"omitempty,min=3"`
-	Email    string `validate:"email" update:"omitempty,email"`
- 	Password string `validate:"password" update:"omitempty,password"`
+	Username string `validate:"min=3" other:"omitempty,min=3"`
+	Email    string `validate:"email" other:"omitempty,email"`
+ 	Password string `validate:"password" other:"omitempty,password"`
 }
 
 func InitPasswordValidation(validate *validator.Validate) {
@@ -40,9 +40,9 @@ func ValidateReg(username string, email string, password string) string {
 	return error_message
 }
 
-func ValidateUpdate(username string, email string, password string) string {
+func ValidateOther(username string, email string, password string) string {
 	validate := validator.New()
-	validate.SetTagName("update")
+	validate.SetTagName("other")
 	InitPasswordValidation(validate)
 
 	user := User{

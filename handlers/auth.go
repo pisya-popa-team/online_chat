@@ -5,6 +5,7 @@ import (
 	"online_chat/models"
 	"online_chat/password_hashing"
 	"online_chat/service"
+	"online_chat/utils"
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,8 +27,8 @@ func Authorisation(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status": 0,
 		"tokens": map[string]string{
-			"access_token": service.NewAccessToken(user.ID),
-            "refresh_token": service.NewRefreshToken(user.ID),
+			"access_token": service.NewAccessToken(utils.IntToString(int(user.ID))),
+            "refresh_token": service.NewRefreshToken(utils.IntToString(int(user.ID))),
 		},
 	})
 }

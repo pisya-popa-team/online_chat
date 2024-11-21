@@ -16,8 +16,8 @@ func RefreshTokens(c echo.Context) error {
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"status": "0",
 		"tokens": map[string]string{
-			"access_token": service.NewAccessToken(utils.StringToUint(id)),
-            "refresh_token": service.NewRefreshToken(utils.StringToUint(id)),
+			"access_token": service.NewAccessToken(id),
+            "refresh_token": service.NewRefreshToken(id),
 		},
 	})
 

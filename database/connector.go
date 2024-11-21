@@ -29,6 +29,7 @@ func connectDB() *gorm.DB {
 		&models.Password{},
 		&models.Room{},
 		&models.RoomPassword{},
+		&models.Recovery{},
 	)
 
 	dbConnection = db

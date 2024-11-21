@@ -2,16 +2,15 @@ package service
 
 import (
 	"online_chat/enviroment"
-	"online_chat/utils"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func NewAccessToken(id uint) string {
+func NewAccessToken(id string) string {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  utils.UintToString(id),
+		"id":  id,
 		"exp": time.Now().Add(time.Minute * 15).Unix(),
 	})
 
@@ -24,10 +23,10 @@ func NewAccessToken(id uint) string {
 	return access_token
 }
 
-func NewRefreshToken(id uint) string {
+func NewRefreshToken(id string) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"id":  utils.UintToString(id),
+			"id":  id,
 			"exp": time.Now().Add(time.Hour * 168).Unix(),
 		})
 

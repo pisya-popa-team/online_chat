@@ -46,15 +46,15 @@ func CreateUser(c echo.Context) error {
     return c.JSON(http.StatusCreated, map[string]interface{}{
 		"status": "0",
 		"tokens": map[string]string{
-			"access_token": service.NewAccessToken(user.ID),
-            "refresh_token": service.NewRefreshToken(user.ID),
+			"access_token": service.NewAccessToken(utils.IntToString(int(user.ID))),
+            "refresh_token": service.NewRefreshToken(utils.IntToString(int(user.ID))),
 		},
 	})
 }
 
 func GetAllUsers(c echo.Context) error {
     var users []models.User
-    db.Preload("Password").Preload("Room").Find(&users)
+    db.Preload("Room").Find(&users)
     
     return c.JSON(http.StatusOK, map[string]interface{}{
         "status": "0",
@@ -67,7 +67,7 @@ func GetInfoAboutMe(c echo.Context) error {
     id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
     var user models.User
-    db.Preload("Password").Preload("Room").Where("id = ?", id).Find(&user)
+    db.Preload("Room").Where("id = ?", id).Find(&user)
 
     return c.JSON(http.StatusOK, map[string]interface{}{
         "status": "0",
@@ -80,11 +80,11 @@ func UpdateUser(c echo.Context) error {
     id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
     var user models.User
-    db.Preload("Password").Preload("Room").Where("id = ?", id).Find(&user)
+    db.Preload("Room").Where("id = ?", id).Find(&user)
 
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
     
-    err_message := validation.ValidateUpdate(username, email, password)
+    err_message := validation.ValidateOther(username, email, password)
     if (err_message != "") {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
             "status": "1",
