@@ -113,11 +113,12 @@ func UpdateUser(c echo.Context) error {
     }
 
     password_form := models.UpdatePassword{
-        Hash: password_hashing.HashPassword(password),
+        Password: password,
     }
 
     db.Model(&user).Updates(service.UpdateUserWithFields(user_form))
     db.Model(&user_password).Updates(service.UpdatePasswordWithFields(password_form))
+    
 
     return c.JSON(http.StatusOK, map[string]interface{}{
         "status": "0",

@@ -6,5 +6,5 @@ type UpdateUser struct {
 }
 
 type UpdatePassword struct {
-	Hash string
+	Password string
 }
