@@ -79,13 +79,18 @@ func UpdateUser(c echo.Context) error {
     token := utils.ExtractTokenFromHeaderString(c.Request().Header.Get("Authorization"))
     id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
-    var user models.User
+    var (
+        user models.User
+        user_password models.Password
+    )
+    
     db.Preload("Password").Preload("Room").Where("id = ?", id).Find(&user)
+    db.Where("user_id = ?", user.ID).Find(&user_password)
 
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
     
     err_message := validation.ValidateUpdate(username, email, password)
-    if (err_message != "") {
+    if err_message != "" {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
             "status": "1",
             "error": err_message,
@@ -102,15 +107,17 @@ func UpdateUser(c echo.Context) error {
         })
     }
 
-    db.Model(&user).Updates(
-        models.User{
-            Username:username,
-            Email:    email,
-            Password: models.Password{
-                Hash: password_hashing.HashPassword(password),
-            },
-        },
-    )
+    user_form := models.UpdateUser{
+        Username: username,
+        Email: email,
+    }
+
+    password_form := models.UpdatePassword{
+        Hash: password_hashing.HashPassword(password),
+    }
+
+    db.Model(&user).Updates(service.UpdateUserWithFields(user_form))
+    db.Model(&user_password).Updates(service.UpdatePasswordWithFields(password_form))
 
     return c.JSON(http.StatusOK, map[string]interface{}{
         "status": "0",
