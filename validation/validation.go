@@ -6,6 +6,10 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+type Options struct {
+	Tag *string
+}
+
 type User struct {
 	Username string `validate:"min=3" other:"omitempty,min=3"`
 	Email    string `validate:"email" other:"omitempty,email"`
@@ -19,9 +23,13 @@ func InitPasswordValidation(validate *validator.Validate) {
     })
 }
 
-func ValidateReg(username string, email string, password string) string {
+func Validate(username string, email string, password string, options Options) string {
 	validate := validator.New()
 	InitPasswordValidation(validate)
+
+	if options.Tag != nil {
+		validate.SetTagName(*options.Tag)
+    }
 
 	user := User{
 		Username: username,
@@ -40,25 +48,5 @@ func ValidateReg(username string, email string, password string) string {
 	return error_message
 }
 
-func ValidateOther(username string, email string, password string) string {
-	validate := validator.New()
-	validate.SetTagName("other")
-	InitPasswordValidation(validate)
 
-	user := User{
-        Username: username,
-        Email:    email,
-        Password: password,
-    }
-
-	err := validate.Struct(user)
-
-	error_message := ""
-
-	if err != nil {
-		error_message = err.Error()
-    }
-
-	return error_message
-}
 
