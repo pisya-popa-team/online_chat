@@ -14,8 +14,8 @@ func EmailSender(user_email string, code string) error {
 	e := gomail.NewMessage()
 	e.SetHeader("From", email)
 	e.SetHeader("To", user_email)
-	e.SetHeader("Subject", "Токен для восстановления пароля")
-	e.SetBody("text/plain", code)
+	e.SetHeader("Subject", "Ссылка для восстановления пароля")
+	e.SetBody("text/plain", "https://tt-chat.danyatochka.ru/recovery?token="+code)
 
 	dialer := gomail.NewDialer(email_smtp, 587, email, email_password)
 

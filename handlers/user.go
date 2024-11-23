@@ -15,7 +15,12 @@ import (
 func CreateUser(c echo.Context) error {
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
     
-    err_message := validation.Validate(username, email, password, validation.Options{})
+    err_message := validation.Validate(validation.User{
+        Username: username,
+        Email: email,
+        Password: password,
+    }, validation.Options{})
+    
     if (err_message != "") {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
             "status": "1",
@@ -89,8 +94,13 @@ func UpdateUser(c echo.Context) error {
 
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
     
-    err_message := validation.Validate(username, email, password, validation.Options{
-        Tag: utils.PointerTo("update"),
+    err_message := validation.Validate(validation.User{
+        Username: username,
+        Email: email,
+        Password: password,
+    }, 
+    validation.Options{
+        Tag: utils.PointerTo("other"),
     })
 
     if err_message != "" {

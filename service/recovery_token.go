@@ -1,9 +1,19 @@
 package service
 
-import "math/rand"
+import "crypto/rand"
 
-func RecoveryToken() int {
-	min := 100000
-	max := 999999
-	return rand.Intn(max-min) + min
+const numbers = "0123456789"
+
+func RecoveryToken() string {
+	bytes := make([]byte, 6)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		return ""
+	}
+
+	for i, b := range bytes {
+		bytes[i] = numbers[b%byte(len(numbers))]
+	}
+
+	return string(bytes)
 }
