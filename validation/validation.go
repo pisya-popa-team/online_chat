@@ -19,9 +19,13 @@ func InitPasswordValidation(validate *validator.Validate) {
     })
 }
 
-func ValidateReg(username string, email string, password string) string {
+func Validate(username string, email string, password string, args ...string) string {
 	validate := validator.New()
 	InitPasswordValidation(validate)
+
+	if len(args) != 0 {
+		validate.SetTagName(args[0])
+    }
 
 	user := User{
 		Username: username,
@@ -40,25 +44,5 @@ func ValidateReg(username string, email string, password string) string {
 	return error_message
 }
 
-func ValidateUpdate(username string, email string, password string) string {
-	validate := validator.New()
-	validate.SetTagName("update")
-	InitPasswordValidation(validate)
 
-	user := User{
-        Username: username,
-        Email:    email,
-        Password: password,
-    }
-
-	err := validate.Struct(user)
-
-	error_message := ""
-
-	if err != nil {
-		error_message = err.Error()
-    }
-
-	return error_message
-}
 
