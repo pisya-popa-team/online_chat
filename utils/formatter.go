@@ -11,3 +11,7 @@ func UintToString(u uint) string {
 	s := strconv.Itoa(int(u))
 	return s
 }
+
+func PointerTo[T ~string](s T) *T {
+    return &s
+}
