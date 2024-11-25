@@ -2,7 +2,7 @@ package service
 
 import "crypto/rand"
 
-const numbers = "0123456789"
+const alphabet = "0123456789"
 
 func RecoveryToken() string {
 	bytes := make([]byte, 6)
@@ -12,7 +12,7 @@ func RecoveryToken() string {
 	}
 
 	for i, b := range bytes {
-		bytes[i] = numbers[b%byte(len(numbers))]
+		bytes[i] = alphabet[b%byte(len(alphabet))]
 	}
 
 	return string(bytes)
