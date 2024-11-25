@@ -25,7 +25,7 @@ func GenerateRecoveryToken(c echo.Context) error {
 
     if (err_message != "") {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
-            "status": "1",
+            "status": "2",
             "error": err_message,
         })
     }
@@ -39,7 +39,7 @@ func GenerateRecoveryToken(c echo.Context) error {
 
 	if code == "" {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
-            "status": "1",
+            "status": "4",
             "error": "error with generation",
         })
 	}
@@ -47,14 +47,14 @@ func GenerateRecoveryToken(c echo.Context) error {
 	db.Where("email =?", user_email).Find(&user)
 	if user.ID == 0 {
 		return c.JSON(http.StatusNotFound, map[string]string{
-            "status": "1",
+            "status": "3",
             "error": "user not found",
         })
 	}
 
 	if email.EmailSender(user_email, code) != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
-            "status": "1",
+            "status": "5",
             "error": "error with sending",
         })
 	}
@@ -97,7 +97,7 @@ func GetRecoveryToken(c echo.Context) error {
 	db.Where("token =?", token).Find(&recovery)
 	if recovery.ID == 0 {
 		return c.JSON(http.StatusNotFound, map[string]string{
-            "status": "1",
+            "status": "3",
             "error": "recovery token not found",
         })
 	}
@@ -130,7 +130,7 @@ func UseRecoveryToken(c echo.Context) error {
 
     if err_message != "" {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
-            "status": "1",
+            "status": "2",
             "error": err_message,
         })
     }

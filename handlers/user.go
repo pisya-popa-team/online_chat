@@ -23,7 +23,7 @@ func CreateUser(c echo.Context) error {
     
     if (err_message != "") {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
-            "status": "1",
+            "status": "2",
             "error": err_message,
         })
     }
@@ -33,7 +33,7 @@ func CreateUser(c echo.Context) error {
 
     if this_user.ID > 0 {
         return c.JSON(http.StatusConflict, map[string]string{
-            "status": "1",
+            "status": "4",
             "error": "this user already exists",
         })
     }
@@ -105,7 +105,7 @@ func UpdateUser(c echo.Context) error {
 
     if err_message != "" {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
-            "status": "1",
+            "status": "2",
             "error": err_message,
         })
     }
@@ -115,7 +115,7 @@ func UpdateUser(c echo.Context) error {
 
     if other_user.ID != 0 {
         return c.JSON(http.StatusConflict, map[string]string{
-            "status": "1",
+            "status": "4",
             "error": "this user already exists",
         })
     }
