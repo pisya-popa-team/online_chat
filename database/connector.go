@@ -16,8 +16,10 @@ func GetDBConnection() *gorm.DB {
 		node_env := enviroment.GoDotEnvVariable("NODE_ENV")
 		if node_env == "development"{
 			connectDBSqlite()
-		} else {
+		} else if node_env == "production"{
 			connectDBPostgres()
+		} else {
+			panic("undefined db connection")
 		}
 	}
 
