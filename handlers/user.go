@@ -15,10 +15,15 @@ import (
 func CreateUser(c echo.Context) error {
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
     
-    err_message := validation.Validate(username, email, password, validation.Options{})
+    err_message := validation.Validate(validation.User{
+        Username: username,
+        Email: email,
+        Password: password,
+    }, validation.Options{})
+    
     if (err_message != "") {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
-            "status": "1",
+            "status": "2",
             "error": err_message,
         })
     }
@@ -28,7 +33,7 @@ func CreateUser(c echo.Context) error {
 
     if this_user.ID > 0 {
         return c.JSON(http.StatusConflict, map[string]string{
-            "status": "1",
+            "status": "4",
             "error": "this user already exists",
         })
     }
@@ -46,15 +51,15 @@ func CreateUser(c echo.Context) error {
     return c.JSON(http.StatusCreated, map[string]interface{}{
 		"status": "0",
 		"tokens": map[string]string{
-			"access_token": service.NewAccessToken(user.ID),
-            "refresh_token": service.NewRefreshToken(user.ID),
+			"access_token": service.NewAccessToken(utils.IntToString(int(user.ID))),
+            "refresh_token": service.NewRefreshToken(utils.IntToString(int(user.ID))),
 		},
 	})
 }
 
 func GetAllUsers(c echo.Context) error {
     var users []models.User
-    db.Preload("Password").Preload("Room").Find(&users)
+    db.Preload("Room").Find(&users)
     
     return c.JSON(http.StatusOK, map[string]interface{}{
         "status": "0",
@@ -67,7 +72,7 @@ func GetInfoAboutMe(c echo.Context) error {
     id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
     var user models.User
-    db.Preload("Password").Preload("Room").Where("id = ?", id).Find(&user)
+    db.Preload("Room").Where("id = ?", id).Find(&user)
 
     return c.JSON(http.StatusOK, map[string]interface{}{
         "status": "0",
@@ -89,13 +94,18 @@ func UpdateUser(c echo.Context) error {
 
     username, email, password := c.FormValue("username"), c.FormValue("email"), c.FormValue("password")
     
-    err_message := validation.Validate(username, email, password, validation.Options{
-        Tag: utils.PointerTo("update"),
+    err_message := validation.Validate(validation.User{
+        Username: username,
+        Email: email,
+        Password: password,
+    }, 
+    validation.Options{
+        Tag: utils.PointerTo("other"),
     })
 
     if err_message != "" {
         return c.JSON(http.StatusUnprocessableEntity, map[string]string{
-            "status": "1",
+            "status": "2",
             "error": err_message,
         })
     }
@@ -105,7 +115,7 @@ func UpdateUser(c echo.Context) error {
 
     if other_user.ID != 0 {
         return c.JSON(http.StatusConflict, map[string]string{
-            "status": "1",
+            "status": "4",
             "error": "this user already exists",
         })
     }

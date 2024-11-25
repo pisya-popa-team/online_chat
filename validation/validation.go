@@ -11,9 +11,9 @@ type Options struct {
 }
 
 type User struct {
-	Username string `validate:"min=3" update:"omitempty,min=3"`
-	Email    string `validate:"email" update:"omitempty,email"`
- 	Password string `validate:"password" update:"omitempty,password"`
+	Username string `validate:"min=3" other:"omitempty,min=3"`
+	Email    string `validate:"email" other:"omitempty,email" email:"email"`
+ 	Password string `validate:"password" other:"omitempty,password" password:"password"`
 }
 
 func InitPasswordValidation(validate *validator.Validate) {
@@ -23,19 +23,13 @@ func InitPasswordValidation(validate *validator.Validate) {
     })
 }
 
-func Validate(username string, email string, password string, options Options) string {
+func Validate(user User, options Options) string {
 	validate := validator.New()
 	InitPasswordValidation(validate)
 
 	if options.Tag != nil {
 		validate.SetTagName(*options.Tag)
     }
-
-	user := User{
-		Username: username,
-        Email:    email,
-        Password: password,
-	}
 
 	err := validate.Struct(user)
 

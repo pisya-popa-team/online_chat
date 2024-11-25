@@ -30,6 +30,7 @@ func main() {
 	routes.InitRefreshRoute(refresh)
 	routes.InitUserRoutes(access)
 	routes.InitRoomRoutes(access)
+	routes.InitRecoverRoutes(e)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
