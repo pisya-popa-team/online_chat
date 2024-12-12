@@ -9,6 +9,11 @@ func IntToString(u int) string {
     return s
 }
 
+func StringToInt(s string) int {
+	i, _ := strconv.Atoi(s)
+    return i
+}
+
 func PointerTo[T ~string](s T) *T {
     return &s
 }

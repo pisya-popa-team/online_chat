@@ -7,9 +7,9 @@ import (
 )
 
 func InitRoomRoutes(access *echo.Group) {
-	access.POST("/room", handlers.CreateRoom)
+	access.POST("/rooms", handlers.CreateRoom)
 	access.GET("/rooms", handlers.GetRooms)
-	access.POST("/room/enter", handlers.EnterRoom)
-	access.DELETE("/room/:id", handlers.DeleteRoom)
-	access.GET("/room/:name", handlers.FindRoomByName)
+	access.POST("/rooms/:id", handlers.EnterRoom)
+	access.DELETE("/rooms/:id", handlers.DeleteRoom)
+	access.GET("/rooms/:name", handlers.FindRoomByName)
 }
