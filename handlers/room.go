@@ -7,6 +7,7 @@ import (
 	"online_chat/service"
 	"online_chat/utils"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -95,7 +96,9 @@ func EnterRoom(c echo.Context) error {
 
 func FindRoomByName(c echo.Context) error {
 	var rooms []models.Room
-	db.Where("name LIKE ?", "%" + c.Param("name") + "%").Find(&rooms)
+
+	input := strings.Replace(c.Param("name"), " ", "%", -1)
+	db.Where("name LIKE ?", "%" + input + "%").Find(&rooms)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status": "0",
