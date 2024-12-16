@@ -24,13 +24,15 @@ func main() {
 	refresh.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(enviroment.GoDotEnvVariable("REFRESH_TOKEN_SECRET")),
 	}))
+	room := e.Group("/access/rooms")
 
 	routes.InitRegRoute(e)
 	routes.InitAuthRoute(e)
+	routes.InitRecoverRoutes(e)
 	routes.InitRefreshRoute(refresh)
 	routes.InitUserRoutes(access)
 	routes.InitRoomRoutes(access)
-	routes.InitRecoverRoutes(e)
+	routes.InitMessageRoutes(room)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

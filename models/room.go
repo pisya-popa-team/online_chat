@@ -7,4 +7,5 @@ type Room struct {
 	RoomType     RoomType     
 	RoomPassword RoomPassword `json:"-" gorm:"foreignKey:RoomID"`
 	Users        []User       `json:"-" gorm:"many2many:room_users"`
+	Messages     []Message    `json:"-" gorm:"foreignKey:RoomID"`
 }

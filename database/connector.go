@@ -36,6 +36,7 @@ func connectDB(db *gorm.DB, err error) *gorm.DB {
 		&models.Room{},
 		&models.RoomPassword{},
 		&models.Recovery{},
+		&models.Message{},
 	)
 	
 	dbConnection = db

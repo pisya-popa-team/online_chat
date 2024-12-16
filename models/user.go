@@ -6,5 +6,6 @@ type User struct {
 	Email         string
 	Password      Password  `json:"-" gorm:"foreignKey:UserID"`
 	Rooms         []Room    `gorm:"foreignKey:UserID"`
-	Recovery      Recovery  `json:"-" gorm:"foreignKey:UserID"`   
+	Recovery      Recovery  `json:"-" gorm:"foreignKey:UserID"`
+	Messages      []Message `json:"-" gorm:"foreignKey:UserID"`
 }
