@@ -7,5 +7,5 @@ import (
 )
 
 func InitMessageRoutes(room *echo.Group){
-	room.GET("/:id/messages", handlers.GetMessages)
+	room.GET("/messages", handlers.GetMessages)
 }
