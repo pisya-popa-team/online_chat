@@ -10,6 +10,7 @@ import (
 	"online_chat/validation"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm/clause"
 )
 
 func CreateUser(c echo.Context) error {
@@ -72,7 +73,7 @@ func GetInfoAboutMe(c echo.Context) error {
     id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))
 
     var user models.User
-    db.Preload("Room").Where("id = ?", id).Find(&user)
+    db.Preload(clause.Associations).Where("id = ?", id).Find(&user)
 
     return c.JSON(http.StatusOK, map[string]interface{}{
         "status": "0",
