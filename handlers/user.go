@@ -60,7 +60,7 @@ func CreateUser(c echo.Context) error {
 
 func GetAllUsers(c echo.Context) error {
     var users []models.User
-    db.Preload("Room").Find(&users)
+    db.Preload(clause.Associations).Find(&users)
     
     return c.JSON(http.StatusOK, map[string]interface{}{
         "status": "0",
