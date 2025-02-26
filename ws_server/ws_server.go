@@ -38,11 +38,6 @@ func ServeWs(c echo.Context) error {
 
 	defer conn.Close()
 
-	client := newClient(conn)
-
-	fmt.Println("New Client joined the hub!")
-	fmt.Println(client)
-
 	for {
 		// Write
 		err := conn.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
