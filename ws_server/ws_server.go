@@ -1,6 +1,7 @@
 package wsserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -37,6 +38,10 @@ var upgrader = websocket.Upgrader{
 // 	}
 // }
 
+type Message struct {
+	Content string `json:"content"`
+}
+
 func ServeWs(c echo.Context) error {
     conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
@@ -47,19 +52,32 @@ func ServeWs(c echo.Context) error {
 	defer conn.Close()
 
 	for {
-		// Write
-		err := conn.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
-		if err != nil {
-			c.Logger().Error(err)
-			return err
-		}
-
 		// Read
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			c.Logger().Error(err)
 			return err
 		}
-		fmt.Printf("%s\n", msg)
+
+		var message Message
+		if err := json.Unmarshal(msg, &message); err != nil {
+			c.Logger().Error("Ошибка разбора JSON:", err)
+			continue
+		}
+
+		fmt.Printf("Получено сообщение: %s\n", message.Content)
+
+		response := Message{Content: "Принято: " + message.Content}
+		respJSON, err := json.Marshal(response)
+		if err != nil {
+			c.Logger().Error("Ошибка кодирования JSON:", err)
+			continue
+		}
+
+		err = conn.WriteMessage(websocket.TextMessage, respJSON)
+		if err != nil {
+			c.Logger().Error(err)
+			return err
+		}
 	}
 }
