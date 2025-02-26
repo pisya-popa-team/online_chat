@@ -2,7 +2,8 @@ package wsserver
 
 import (
 	"fmt"
-	"net/http"
+	// "net/http"
+
 	// "sync"
 
 	"github.com/gorilla/websocket"
@@ -32,10 +33,7 @@ var upgrader = websocket.Upgrader{
 func ServeWs(c echo.Context) error {
     conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"status": "5",
-            "error": "failed to upgrade connection",
-		})
+		c.Logger().Error(err)
 	}
 
 	defer conn.Close()
