@@ -2,7 +2,7 @@ package wsserver
 
 import (
 	"fmt"
-	// "net/http"
+	"net/http"
 
 	// "sync"
 
@@ -13,6 +13,13 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  4096,
 	WriteBufferSize: 4096,
+	CheckOrigin: func(r *http.Request) bool {
+		allowedOrigins := map[string]bool{
+			"http://localhost:4200": true,
+			"https://tt-chat.danyatochka.ru/": true,
+		}
+		return allowedOrigins[r.Header.Get("Origin")]
+	},
 }
 
 // type WsServer struct {
@@ -34,6 +41,7 @@ func ServeWs(c echo.Context) error {
     conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		c.Logger().Error(err)
+		return err
 	}
 
 	defer conn.Close()
@@ -43,12 +51,14 @@ func ServeWs(c echo.Context) error {
 		err := conn.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
 		if err != nil {
 			c.Logger().Error(err)
+			return err
 		}
 
 		// Read
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			c.Logger().Error(err)
+			return err
 		}
 		fmt.Printf("%s\n", msg)
 	}
