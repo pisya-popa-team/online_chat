@@ -52,7 +52,6 @@ func ServeWs(c echo.Context) error {
 	defer conn.Close()
 
 	for {
-		// Read
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			c.Logger().Error(err)
@@ -63,6 +62,28 @@ func ServeWs(c echo.Context) error {
 		if err := json.Unmarshal(msg, &message); err != nil {
 			c.Logger().Error("Ошибка разбора JSON:", err)
 			continue
+		}
+
+		if message.Content == "close" {
+			response := Message{Content: "disconnecting"}
+			respJSON, err := json.Marshal(response)
+			if err != nil {
+				c.Logger().Error("Ошибка кодирования JSON:", err)
+				continue
+			}
+	
+			err = conn.WriteMessage(websocket.TextMessage, respJSON)
+			if err != nil {
+				c.Logger().Error(err)
+				break
+			}
+	
+			err = conn.Close()
+			if err != nil {
+				c.Logger().Error("Ошибка при закрытии соединения:", err)
+			}
+	
+			return nil
 		}
 
 		fmt.Printf("Получено сообщение: %s\n", message.Content)
@@ -80,4 +101,6 @@ func ServeWs(c echo.Context) error {
 			return err
 		}
 	}
+
+	return nil
 }
