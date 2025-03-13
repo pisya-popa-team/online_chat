@@ -97,8 +97,17 @@ func EnterRoom(c echo.Context) error {
 func FindRoomByName(c echo.Context) error {
 	var rooms []models.Room
 
-	input := strings.Replace(c.Param("name"), " ", "%", -1)
-	db.Where("name LIKE ?", "%" + input + "%").Find(&rooms)
+	input := strings.Trim(c.Param("name"), " ")
+	input_n := strings.Split(input, " ")
+	condition := ""
+	for _, word := range input_n {
+		if condition == "" {
+			condition = "LOWER(name) LIKE LOWER('%" + word + "%')"
+		} else {
+			condition = condition + " AND LOWER(name) LIKE LOWER('%" + word + "%')"
+		}
+	}
+	db.Debug().Where(condition).Find(&rooms)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status": "0",
