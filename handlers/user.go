@@ -81,6 +81,24 @@ func GetInfoAboutMe(c echo.Context) error {
     })
 }
 
+func GetUser (c echo.Context) error {
+    id := c.Param("id")
+    var user models.User
+    db.Preload(clause.Associations).Where("id =?", id).Find(&user)
+
+    if user.ID == 0 {
+        return c.JSON(http.StatusNotFound, map[string]string{
+            "status": "3",
+            "error": "user not found",
+        })
+    }
+
+    return c.JSON(http.StatusOK, map[string]interface{}{
+        "status": "0",
+        "user": user,
+    })
+}
+
 func UpdateUser(c echo.Context) error {
     token := utils.ExtractTokenFromHeaderString(c.Request().Header.Get("Authorization"))
     id := service.ExtractUsernameFromToken(token, enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET"))

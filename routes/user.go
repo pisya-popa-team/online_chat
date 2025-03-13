@@ -8,5 +8,6 @@ import (
 func InitUserRoutes(access *echo.Group) {
 	access.GET("/users/me", handlers.GetInfoAboutMe)
 	access.GET("/users", handlers.GetAllUsers)
+	access.GET("/users/:id", handlers.GetUser)
 	access.PATCH("/users", handlers.UpdateUser)
 }

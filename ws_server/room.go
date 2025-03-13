@@ -1,13 +1,14 @@
 package wsserver
 
 import (
+	"online_chat/models"
 	"sync"
 )
 
 type Room struct {
 	RoomID     uint
 	Clients    []*Client
-	Messages   chan ClientMessage
+	Messages   chan models.Message
 	start_once sync.Once
 }
 
@@ -15,7 +16,7 @@ func NewRoom(room_id uint) *Room {
 	return &Room{
 		RoomID:  room_id,
 		Clients: []*Client{},
-		Messages: make(chan ClientMessage),
+		Messages: make(chan models.Message),
 	}
 }
 
