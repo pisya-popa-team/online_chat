@@ -2,6 +2,7 @@ package utils
 
 import (
 	"strconv"
+	"time"
 )
 
 func IntToString(u int) string {
@@ -16,4 +17,10 @@ func StringToInt(s string) int {
 
 func PointerTo[T ~string](s T) *T {
     return &s
+}
+
+var layout = "00.00.00 00:00"
+func FormatStringToDate(s string) time.Time{
+	t, _ := time.Parse(layout, s)
+	return t
 }

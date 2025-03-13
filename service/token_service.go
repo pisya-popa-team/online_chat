@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"online_chat/enviroment"
 	"time"
 
@@ -54,4 +55,27 @@ func ExtractUsernameFromToken(token_string string, secret string) string {
 	id := claims["id"].(string)
 
 	return id
+}
+
+func ValidateAccessToken(access_token string, secret string) error {
+	if access_token == "" {
+		return errors.New("token must not be empty")
+	}
+
+	token, err := ParseToken(access_token, secret)
+	if err != nil || !token.Valid {
+		return errors.New("token invalid")
+	}
+
+	claims, _ := token.Claims.(jwt.MapClaims)
+	exp, ok := claims["exp"].(float64)
+	if ok {
+		if int64(exp) < time.Now().Unix() {
+			return errors.New("token expired")
+		}
+	} else  {
+		return errors.New("invalid or missing expiration time")
+	}
+
+	return nil
 }

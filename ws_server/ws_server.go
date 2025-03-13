@@ -1,11 +1,10 @@
 package wsserver
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
-
-	// "sync"
+	"online_chat/enviroment"
+	"online_chat/service"
+	"online_chat/utils"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -23,84 +22,45 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-// type WsServer struct {
-// 	clients    map[*Client]bool
-// 	register   chan *Client
-// 	unregister chan *Client
-// 	mu 		   sync.Mutex
-// }
 
-// func NewWsServer() *WsServer {
-//     return &WsServer{
-// 		clients:    make(map[*Client]bool),
-// 		register:   make(chan *Client),
-// 		unregister: make(chan *Client),
-// 	}
-// }
-
-type Message struct {
-	Content string `json:"content"`
-}
+var room_manager = NewRoomManager()
+var secret = enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")
 
 func ServeWs(c echo.Context) error {
+	token := c.QueryParam("token")
+	room_id := uint(utils.StringToInt(c.Param("id")))
+	err := service.ValidateAccessToken(token, secret)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"status": 1,
+			"message": err.Error(),
+		})
+	}
+
     conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		c.Logger().Error(err)
 		return err
 	}
 
-	defer conn.Close()
+	client := &Client{
+		UserID: uint(utils.StringToInt(service.ExtractUsernameFromToken(token, secret))),
+		Conn:   conn,
+	}
 
-	for {
-		_, msg, err := conn.ReadMessage()
-		if err != nil {
-			c.Logger().Error(err)
-			return err
+
+	err = room_manager.AddClientToRoom(client, room_id)
+	if err != nil {
+		error_message := map[string]interface{}{
+			"message": err.Error(),
 		}
-
-		var message Message
-		if err := json.Unmarshal(msg, &message); err != nil {
-			c.Logger().Error("Ошибка разбора JSON:", err)
-			continue
-		}
-
-		if message.Content == "close" {
-			response := Message{Content: "disconnecting"}
-			respJSON, err := json.Marshal(response)
-			if err != nil {
-				c.Logger().Error("Ошибка кодирования JSON:", err)
-				continue
-			}
 	
-			err = conn.WriteMessage(websocket.TextMessage, respJSON)
-			if err != nil {
-				c.Logger().Error(err)
-				break
-			}
-	
-			err = conn.Close()
-			if err != nil {
-				c.Logger().Error("Ошибка при закрытии соединения:", err)
-			}
-	
-			return nil
-		}
-
-		fmt.Printf("Получено сообщение: %s\n", message.Content)
-
-		response := Message{Content: "Принято: " + message.Content}
-		respJSON, err := json.Marshal(response)
-		if err != nil {
-			c.Logger().Error("Ошибка кодирования JSON:", err)
-			continue
-		}
-
-		err = conn.WriteMessage(websocket.TextMessage, respJSON)
-		if err != nil {
-			c.Logger().Error(err)
-			return err
-		}
+		_ = conn.WriteJSON(error_message)
+		conn.Close()
+		return nil
 	}
 
 	return nil
 }
+
