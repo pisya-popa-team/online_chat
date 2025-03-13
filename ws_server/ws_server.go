@@ -31,8 +31,11 @@ var room_manager = NewRoomManager()
 var secret = enviroment.GoDotEnvVariable("ACCESS_TOKEN_SECRET")
 
 func ServeWs(c echo.Context) error {
+	fmt.Println("ServeWs called!")
 	token := c.QueryParam("token")
 	room_id := uint(utils.StringToInt(c.Param("id")))
+	fmt.Println("Token:", token)
+    fmt.Println("Room ID:", room_id)
 	err := service.ValidateAccessToken(token, secret)
 
 	if err != nil {
@@ -45,8 +48,11 @@ func ServeWs(c echo.Context) error {
     conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		c.Logger().Error(err)
+		fmt.Println("WebSocket Upgrade Error:", err)
 		return err
 	}
+
+	fmt.Println("WebSocket connection established")
 
 	client := &Client{
 		UserID: uint(utils.StringToInt(service.ExtractUsernameFromToken(token, secret))),
@@ -56,6 +62,7 @@ func ServeWs(c echo.Context) error {
 
 	err = room_manager.AddClientToRoom(client, room_id)
 	if err != nil {
+		fmt.Println("Error adding client to room:", err)
 		error_message := map[string]interface{}{
 			"message": err.Error(),
 		}
