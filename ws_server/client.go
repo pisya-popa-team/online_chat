@@ -34,20 +34,15 @@ func (c *Client) ReadMessages(room *Room, room_manager *RoomManager) {
 		}
 
 		message := models.Message{
+			MessageType: models.UserM,
 			Content: client_message.Content,
 			SentAt: utils.FormatStringToDate(client_message.SentAt),
 			RoomID: client_message.RoomID,
-			UserID: uint(utils.StringToInt(c.FindUserName())),
+			UserID: c.UserID,
 		}
 
 		db.Create(&message)
 
 		room.Messages <- client_message
 	}
-}
-
-func (c *Client) FindUserName () string {
-	var user models.User
-	db.Where("id = ?", c.UserID).Find(&user)
-	return user.Username
 }

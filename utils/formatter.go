@@ -19,7 +19,7 @@ func PointerTo[T ~string](s T) *T {
     return &s
 }
 
-var layout = "00.00.00 00:00"
+var layout = "01.01.25 13:21"
 func FormatStringToDate(s string) time.Time{
 	t, _ := time.Parse(layout, s)
 	return t
