@@ -107,7 +107,7 @@ func FindRoomByName(c echo.Context) error {
 			condition = condition + " AND LOWER(name) LIKE LOWER('%" + word + "%')"
 		}
 	}
-	db.Debug().Where(condition).Find(&rooms)
+	db.Where(condition).Find(&rooms)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status": "0",
