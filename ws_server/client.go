@@ -24,7 +24,7 @@ func (c *Client) ReadMessages(room *Room, room_manager *RoomManager) {
 	}()
 
 	for {
-		var this_message models.Message
+		var this_message ClientMessage
 		err := c.Conn.ReadJSON(&this_message)
 		if err != nil {
 			break
@@ -35,7 +35,8 @@ func (c *Client) ReadMessages(room *Room, room_manager *RoomManager) {
 			Content: this_message.Content,
 			SentAt:  this_message.SentAt,
 			RoomID:  this_message.RoomID,
-			UserID:  c.UserID,
+			UserID:  this_message.UserID,
+			User:    GetUser(this_message.UserID),
 		}
 
 		db.Create(&message)

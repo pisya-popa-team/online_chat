@@ -1,14 +1,13 @@
 package wsserver
 
 import (
-	"online_chat/models"
 	"sync"
 )
 
 type Room struct {
 	RoomID     uint
 	Clients    []*Client
-	Messages   chan models.Message
+	Messages   chan ClientMessage
 	start_once sync.Once
 }
 
@@ -16,8 +15,17 @@ func NewRoom(room_id uint) *Room {
 	return &Room{
 		RoomID:  room_id,
 		Clients: []*Client{},
-		Messages: make(chan models.Message),
+		Messages: make(chan ClientMessage),
 	}
+}
+
+type ClientMessage struct {
+	MessageType  string `json:"message_type"`
+	Content      string	`json:"content"`
+	SentAt       string	`json:"sent_at"`
+	RoomID       uint	`json:"room_id"` 
+	UserID       uint	`json:"user_id"`
+	Username     string	`json:"username"`
 }
 
 func (r *Room) HandleMessages(rm *RoomManager) {
