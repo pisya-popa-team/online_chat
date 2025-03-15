@@ -15,7 +15,11 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  4096,
 	WriteBufferSize: 4096,
 	CheckOrigin: func(r *http.Request) bool {
-		return true // Отключает проверку Origin
+		allowedOrigins := map[string]bool{
+			"http://localhost:4200": true,
+			"https://tt-chat.danyatochka.ru/": true,
+		}
+		return allowedOrigins[r.Header.Get("Origin")]
 	},
 }
 
