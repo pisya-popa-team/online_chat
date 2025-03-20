@@ -11,16 +11,18 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var allowedOrigins = map[string]bool{
+	"http://localhost:4200": true,
+	"https://tt-chat.danyatochka.ru": true,
+}
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  4096,
 	WriteBufferSize: 4096,
 	CheckOrigin: func(r *http.Request) bool {
-		allowedOrigins := map[string]bool{
-			"http://localhost:4200": true,
-			"https://tt-chat.danyatochka.ru": true,
-		}
 		fmt.Println(r.Header.Get("Origin"))
-		return allowedOrigins[r.Header.Get("Origin")]
+		_, ok := allowedOrigins[r.Header.Get("Origin")]
+		return ok
 	},
 }
 
